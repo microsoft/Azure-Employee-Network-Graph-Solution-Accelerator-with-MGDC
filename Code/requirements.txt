@@ -1,0 +1,4 @@
+networkx==2.8
+azure-ai-textanalytics==5.1.0
+spacy
+nltk

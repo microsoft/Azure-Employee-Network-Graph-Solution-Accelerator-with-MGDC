@@ -1,0 +1,94 @@
+{
+    "name": "o365dataload_mailfolders",
+    "properties": {
+        "activities": [
+            {
+                "name": "loadmailfolders",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "Office365Source",
+                        "allowedGroups": {
+                            "value": "@pipeline().parameters.user_group",
+                            "type": "Expression"
+                        },
+                        "outputColumns": [
+                            {
+                                "name": "id"
+                            },
+                            {
+                                "name": "displayName"
+                            },
+                            {
+                                "name": "parentFolderId"
+                            },
+                            {
+                                "name": "childFolderCount"
+                            },
+                            {
+                                "name": "unreadItemCount"
+                            },
+                            {
+                                "name": "totalItemCount"
+                            }
+                        ]
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        }
+                    },
+                    "enableStaging": false
+                },
+                "inputs": [
+                    {
+                        "referenceName": "Office365MailFolder",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "ADLSMailFolder",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "folder_name": "mailfolders",
+                            "subfolder_name": "mailfolders",
+                            "user_group_name": {
+                                "value": "@pipeline().parameters.user_group_name",
+                                "type": "Expression"
+                            },
+                            "file_system_name": {
+                                "value": "@pipeline().parameters.file_system_name",
+                                "type": "Expression"
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        "parameters": {
+            "user_group": {
+                "type": "array"
+            },
+            "user_group_name": {
+                "type": "string"
+            },
+            "file_system_name": {
+                "type": "string"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2022-06-24T16:14:25Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}

@@ -1,0 +1,355 @@
+{
+    "name": "o365dataload_all_wrapper",
+    "properties": {
+        "activities": [
+            {
+                "name": "Add_Members_To_InitialLoad_Usergroup",
+                "type": "SynapseNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "Add_Members_To_InitialLoad_Usergroup",
+                        "type": "NotebookReference"
+                    },
+                    "parameters": {
+                        "initial_load_user_group_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.initial_load_user_group_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "initial_load_user_group": {
+                            "value": {
+                                "value": "@string(pipeline().parameters.initial_load_user_group)",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        }
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": "spark1",
+                        "type": "BigDataPoolReference"
+                    }
+                }
+            },
+            {
+                "name": "o365dataload_users",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Add_Members_To_InitialLoad_Usergroup",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "o365dataload_users",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "user_group_name": {
+                            "value": "@pipeline().parameters.initial_load_user_group_name",
+                            "type": "Expression"
+                        },
+                        "user_group": {
+                            "value": "@pipeline().parameters.initial_load_user_group",
+                            "type": "Expression"
+                        },
+                        "file_system_name": {
+                            "value": "@pipeline().parameters.file_system_name",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "o365dataload_mailfolders",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Add_Members_To_InitialLoad_Usergroup",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "o365dataload_mailfolders",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "user_group": {
+                            "value": "@pipeline().parameters.initial_load_user_group",
+                            "type": "Expression"
+                        },
+                        "user_group_name": {
+                            "value": "@pipeline().parameters.initial_load_user_group_name",
+                            "type": "Expression"
+                        },
+                        "file_system_name": {
+                            "value": "@pipeline().parameters.file_system_name",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "ProcessO365Data_Users_Mailfolders",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "o365dataload_users",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "o365dataload_mailfolders",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "ProcessO365Data_Users_Mailfolders",
+                        "type": "NotebookReference"
+                    },
+                    "parameters": {
+                        "data_lake_account_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.data_lake_account_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "file_system_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.file_system_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "user_group_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.initial_load_user_group_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        }
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": "spark1",
+                        "type": "BigDataPoolReference"
+                    }
+                }
+            },
+            {
+                "name": "o365dataload_messages_wrapper",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "ProcessO365Data_Users_Mailfolders",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "o365dataload_messages_wrapper",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "data_lake_account_name": {
+                            "value": "@pipeline().parameters.data_lake_account_name",
+                            "type": "Expression"
+                        },
+                        "file_system_name": {
+                            "value": "@pipeline().parameters.file_system_name",
+                            "type": "Expression"
+                        },
+                        "folder_name": "messages",
+                        "initial_load_user_group_name": {
+                            "value": "@pipeline().parameters.initial_load_user_group_name",
+                            "type": "Expression"
+                        },
+                        "initial_load_user_group": {
+                            "value": "@pipeline().parameters.initial_load_user_group",
+                            "type": "Expression"
+                        },
+                        "delta_load_user_group_name": {
+                            "value": "@pipeline().parameters.delta_load_user_group_name",
+                            "type": "Expression"
+                        },
+                        "delta_load_user_group": {
+                            "value": "@pipeline().parameters.delta_load_user_group",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "o365dataload_events_wrapper",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "ProcessO365Data_Users_Mailfolders",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "o365dataload_events_wrapper",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "data_lake_account_name": {
+                            "value": "@pipeline().parameters.data_lake_account_name",
+                            "type": "Expression"
+                        },
+                        "file_system_name": {
+                            "value": "@pipeline().parameters.file_system_name",
+                            "type": "Expression"
+                        },
+                        "folder_name": "events",
+                        "initial_load_user_group_name": {
+                            "value": "@pipeline().parameters.initial_load_user_group_name",
+                            "type": "Expression"
+                        },
+                        "initial_load_user_group": {
+                            "value": "@pipeline().parameters.initial_load_user_group",
+                            "type": "Expression"
+                        },
+                        "delta_load_user_group_name": {
+                            "value": "@pipeline().parameters.delta_load_user_group_name",
+                            "type": "Expression"
+                        },
+                        "delta_load_user_group": {
+                            "value": "@pipeline().parameters.delta_load_user_group",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "Copy_Members_From_Initial_To_Delta_Group",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "o365dataload_messages_wrapper",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "o365dataload_events_wrapper",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "Copy_Members_From_Initial_To_Delta_Group",
+                        "type": "NotebookReference"
+                    },
+                    "parameters": {
+                        "initial_load_user_group": {
+                            "value": {
+                                "value": "@string(pipeline().parameters.initial_load_user_group)",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "delta_load_user_group": {
+                            "value": {
+                                "value": "@string(pipeline().parameters.delta_load_user_group)",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        }
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": "spark1",
+                        "type": "BigDataPoolReference"
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "data_lake_account_name": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "file_system_name": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "initial_load_user_group_name": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "initial_load_user_group": {
+                "type": "array",
+                "defaultValue": [
+                    ""
+                ]
+            },
+            "delta_load_user_group_name": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "delta_load_user_group": {
+                "type": "array",
+                "defaultValue": [
+                    ""
+                ]
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2022-06-21T10:33:01Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}

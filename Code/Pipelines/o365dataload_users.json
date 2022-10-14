@@ -1,0 +1,214 @@
+{
+    "name": "o365dataload_users",
+    "properties": {
+        "activities": [
+            {
+                "name": "loadusers",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "Office365Source",
+                        "allowedGroups": {
+                            "value": "@pipeline().parameters.user_group",
+                            "type": "Expression"
+                        },
+                        "outputColumns": [
+                            {
+                                "name": "aboutMe"
+                            },
+                            {
+                                "name": "accountEnabled"
+                            },
+                            {
+                                "name": "ageGroup"
+                            },
+                            {
+                                "name": "assignedLicenses"
+                            },
+                            {
+                                "name": "assignedPlans"
+                            },
+                            {
+                                "name": "birthday"
+                            },
+                            {
+                                "name": "businessPhones"
+                            },
+                            {
+                                "name": "city"
+                            },
+                            {
+                                "name": "companyName"
+                            },
+                            {
+                                "name": "consentProvidedForMinor"
+                            },
+                            {
+                                "name": "country"
+                            },
+                            {
+                                "name": "createdDateTime"
+                            },
+                            {
+                                "name": "department"
+                            },
+                            {
+                                "name": "displayName"
+                            },
+                            {
+                                "name": "givenName"
+                            },
+                            {
+                                "name": "hireDate"
+                            },
+                            {
+                                "name": "id"
+                            },
+                            {
+                                "name": "imAddresses"
+                            },
+                            {
+                                "name": "interests"
+                            },
+                            {
+                                "name": "jobTitle"
+                            },
+                            {
+                                "name": "legalAgeGroupClassification"
+                            },
+                            {
+                                "name": "mail"
+                            },
+                            {
+                                "name": "mailNickname"
+                            },
+                            {
+                                "name": "mobilePhone"
+                            },
+                            {
+                                "name": "mySite"
+                            },
+                            {
+                                "name": "officeLocation"
+                            },
+                            {
+                                "name": "onPremisesImmutableId"
+                            },
+                            {
+                                "name": "onPremisesLastSyncDateTime"
+                            },
+                            {
+                                "name": "onPremisesSecurityIdentifier"
+                            },
+                            {
+                                "name": "onPremisesSyncEnabled"
+                            },
+                            {
+                                "name": "passwordPolicies"
+                            },
+                            {
+                                "name": "pastProjects"
+                            },
+                            {
+                                "name": "postalCode"
+                            },
+                            {
+                                "name": "preferredLanguage"
+                            },
+                            {
+                                "name": "preferredName"
+                            },
+                            {
+                                "name": "provisionedPlans"
+                            },
+                            {
+                                "name": "proxyAddresses"
+                            },
+                            {
+                                "name": "responsibilities"
+                            },
+                            {
+                                "name": "schools"
+                            },
+                            {
+                                "name": "skills"
+                            },
+                            {
+                                "name": "state"
+                            },
+                            {
+                                "name": "streetAddress"
+                            },
+                            {
+                                "name": "surname"
+                            },
+                            {
+                                "name": "usageLocation"
+                            },
+                            {
+                                "name": "userPrincipalName"
+                            },
+                            {
+                                "name": "userType"
+                            }
+                        ]
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        }
+                    },
+                    "enableStaging": false
+                },
+                "inputs": [
+                    {
+                        "referenceName": "Office365Users",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "ADLSUsers",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "folder_name": "users",
+                            "subfoloder_name": "users",
+                            "user_group_name": {
+                                "value": "@pipeline().parameters.user_group_name",
+                                "type": "Expression"
+                            },
+                            "file_system_name": {
+                                "value": "@pipeline().parameters.file_system_name",
+                                "type": "Expression"
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        "parameters": {
+            "user_group_name": {
+                "type": "string"
+            },
+            "user_group": {
+                "type": "string"
+            },
+            "file_system_name": {
+                "type": "string"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2022-06-10T23:10:57Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}

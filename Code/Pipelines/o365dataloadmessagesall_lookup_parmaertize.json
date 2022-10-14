@@ -1,0 +1,350 @@
+{
+    "name": "o365dataloadmessagesall_lookup_parmaertize",
+    "properties": {
+        "activities": [
+            {
+                "name": "Lookup_LastRunDate",
+                "type": "Lookup",
+                "dependsOn": [
+                    {
+                        "activity": "UpdateLastRunDate",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "dataset": {
+                        "referenceName": "LastUpdatedDate",
+                        "type": "DatasetReference"
+                    },
+                    "firstRowOnly": true
+                }
+            },
+            {
+                "name": "LoadMessages",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "Lookup_LastRunDate",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "endtime",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "folderpath",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "Office365Source",
+                        "dateFilterColumn": "CreatedDateTime",
+                        "startTime": {
+                            "value": "@formatDateTime(activity('Lookup_LastRunDate').output.firstRow.Prop_0)",
+                            "type": "Expression"
+                        },
+                        "endTime": {
+                            "value": "@variables('endtime')",
+                            "type": "Expression"
+                        },
+                        "outputColumns": [
+                            {
+                                "name": "ReceivedDateTime"
+                            },
+                            {
+                                "name": "SentDateTime"
+                            },
+                            {
+                                "name": "HasAttachments"
+                            },
+                            {
+                                "name": "InternetMessageId"
+                            },
+                            {
+                                "name": "Subject"
+                            },
+                            {
+                                "name": "Importance"
+                            },
+                            {
+                                "name": "ParentFolderId"
+                            },
+                            {
+                                "name": "Sender"
+                            },
+                            {
+                                "name": "From"
+                            },
+                            {
+                                "name": "ToRecipients"
+                            },
+                            {
+                                "name": "CcRecipients"
+                            },
+                            {
+                                "name": "BccRecipients"
+                            },
+                            {
+                                "name": "ReplyTo"
+                            },
+                            {
+                                "name": "ConversationId"
+                            },
+                            {
+                                "name": "UniqueBody"
+                            },
+                            {
+                                "name": "IsDeliveryReceiptRequested"
+                            },
+                            {
+                                "name": "IsReadReceiptRequested"
+                            },
+                            {
+                                "name": "IsRead"
+                            },
+                            {
+                                "name": "IsDraft"
+                            },
+                            {
+                                "name": "WebLink"
+                            },
+                            {
+                                "name": "CreatedDateTime"
+                            },
+                            {
+                                "name": "LastModifiedDateTime"
+                            },
+                            {
+                                "name": "ChangeKey"
+                            },
+                            {
+                                "name": "Categories"
+                            },
+                            {
+                                "name": "Id"
+                            },
+                            {
+                                "name": "Attachments"
+                            }
+                        ]
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        }
+                    },
+                    "enableStaging": false
+                },
+                "inputs": [
+                    {
+                        "referenceName": "Office365Messages",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "testdataset",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "parameter1": {
+                                "value": "@variables('folderpath')",
+                                "type": "Expression"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "UpdateLastRunDate",
+                "type": "SynapseNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "Update_Last_Run_Date",
+                        "type": "NotebookReference"
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": "spark1",
+                        "type": "BigDataPoolReference"
+                    }
+                }
+            },
+            {
+                "name": "ProcessO365Data_Messages",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "LoadMessages",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "ProcessO365Data_Messages",
+                        "type": "NotebookReference"
+                    },
+                    "parameters": {
+                        "folderpath": {
+                            "value": {
+                                "value": "@variables('folderpath')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "data_lake_account_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.data_lake_account_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "file_system_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.file_system_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "folder_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.folder_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "initialLoad": {
+                            "value": {
+                                "value": "@pipeline().parameters.initialLoad",
+                                "type": "Expression"
+                            },
+                            "type": "bool"
+                        }
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": "spark1",
+                        "type": "BigDataPoolReference"
+                    }
+                }
+            },
+            {
+                "name": "endtime",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "endtime",
+                    "value": {
+                        "value": "@utcNow()",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "folderpath",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "Lookup_LastRunDate",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "folderpath",
+                    "value": {
+                        "value": "@concat(string(formatDateTime(activity('Lookup_LastRunDate').output.firstRow.Prop_0, 'yyyy-MM-dd-HH-mm-ss')),'_',string(formatDateTime(variables('endtime'),'yyyy-MM-dd-HH-mm-ss')))",
+                        "type": "Expression"
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "initialLoad": {
+                "type": "bool",
+                "defaultValue": false
+            },
+            "data_lake_account_name": {
+                "type": "string",
+                "defaultValue": "relmeshsadls"
+            },
+            "file_system_name": {
+                "type": "string",
+                "defaultValue": "relmeshadlsfs"
+            },
+            "folder_name": {
+                "type": "string",
+                "defaultValue": "messages_new"
+            }
+        },
+        "variables": {
+            "endtime": {
+                "type": "String"
+            },
+            "folderpath": {
+                "type": "String"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2022-05-04T18:35:44Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}

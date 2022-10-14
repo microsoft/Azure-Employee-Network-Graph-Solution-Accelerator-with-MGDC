@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    
+    "parameters": {
+        "KeyVaultName":{
+            "type":"string",
+            "defaultValue": "xxx", 
+            "metadata": {
+                "description":"The name of your Key Vault that you are using for this solution"
+            }
+        },
+        "mgdcConnectionId": {
+            "type": "securestring", 
+            "metadata": {
+                "description": "The Text Analytics key you are using for this solution"
+            }
+        }, 
+        "mgdcConnectionSecret": {
+            "type": "securestring", 
+            "metadata": {
+                "description": "The Text Analytics endpoint you are using for this solution"
+            }
+        }     
+    },
+
+    "variables": {
+        "MGDC_Connection_Id":"mgdcconnectionid",
+        "MGDC_Connection_Secret":"mgdcconnectionsecret"
+    },
+
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('KeyVaultName'), '/', variables('MGDC_Connection_Id'))]",
+            "properties": {
+                "value": "[parameters('mgdcConnectionId')]"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('KeyVaultName'), '/', variables('MGDC_Connection_Secret'))]",
+            "properties": {
+                "value": "[parameters('mgdcConnectionSecret')]"
+            },
+            "dependsOn": []
+        },
+        { 
+            "apiVersion": "2020-10-01",
+            "name": "pid-402d4599-92d7-5c69-b137-24515b597ec2",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        }
+    ]
+}

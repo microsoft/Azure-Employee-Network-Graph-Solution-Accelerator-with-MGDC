@@ -1,0 +1,509 @@
+{
+    "name": "o365dataload_messages",
+    "properties": {
+        "activities": [
+            {
+                "name": "GetLastRunDate",
+                "type": "SynapseNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "Get_Messages_Last_Run_Date",
+                        "type": "NotebookReference"
+                    },
+                    "parameters": {
+                        "data_lake_account_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.data_lake_account_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "file_system_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.file_system_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "folder_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.folder_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "initial_load_user_group_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.initial_load_user_group_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "initialLoad": {
+                            "value": {
+                                "value": "@pipeline().parameters.initialLoad",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "initial_load_user_group": {
+                            "value": {
+                                "value": "@string(pipeline().parameters.initial_load_user_group)",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "delta_load_user_group": {
+                            "value": {
+                                "value": "@string(pipeline().parameters.delta_load_user_group)",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "delta_load_user_group_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.delta_load_user_group_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        }
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": "spark1",
+                        "type": "BigDataPoolReference"
+                    }
+                }
+            },
+            {
+                "name": "Switch1",
+                "type": "Switch",
+                "dependsOn": [
+                    {
+                        "activity": "GetLastRunDate",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "on": {
+                        "value": "@activity('GetLastRunDate').output.status.Output.result.exitValue",
+                        "type": "Expression"
+                    },
+                    "cases": [
+                        {
+                            "value": "Error",
+                            "activities": [
+                                {
+                                    "name": "Fail1",
+                                    "type": "Fail",
+                                    "dependsOn": [],
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "message": "Unable to add members to AD Group",
+                                        "errorCode": "500"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "value": "Success",
+                            "activities": [
+                                {
+                                    "name": "PipeLineStatus",
+                                    "type": "SetVariable",
+                                    "dependsOn": [],
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "variableName": "pipelinestatus",
+                                        "value": "Success"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "defaultActivities": [
+                        {
+                            "name": "LoadMessages",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "subfoldername",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "Office365Source",
+                                    "dateFilterColumn": "CreatedDateTime",
+                                    "startTime": {
+                                        "value": "@variables('starttime')",
+                                        "type": "Expression"
+                                    },
+                                    "endTime": {
+                                        "value": "@variables('endtime')",
+                                        "type": "Expression"
+                                    },
+                                    "allowedGroups": {
+                                        "value": "@variables('user_group')",
+                                        "type": "Expression"
+                                    },
+                                    "outputColumns": [
+                                        {
+                                            "name": "ReceivedDateTime"
+                                        },
+                                        {
+                                            "name": "SentDateTime"
+                                        },
+                                        {
+                                            "name": "HasAttachments"
+                                        },
+                                        {
+                                            "name": "InternetMessageId"
+                                        },
+                                        {
+                                            "name": "Subject"
+                                        },
+                                        {
+                                            "name": "Importance"
+                                        },
+                                        {
+                                            "name": "ParentFolderId"
+                                        },
+                                        {
+                                            "name": "Sender"
+                                        },
+                                        {
+                                            "name": "From"
+                                        },
+                                        {
+                                            "name": "ToRecipients"
+                                        },
+                                        {
+                                            "name": "CcRecipients"
+                                        },
+                                        {
+                                            "name": "BccRecipients"
+                                        },
+                                        {
+                                            "name": "ReplyTo"
+                                        },
+                                        {
+                                            "name": "ConversationId"
+                                        },
+                                        {
+                                            "name": "UniqueBody"
+                                        },
+                                        {
+                                            "name": "IsDeliveryReceiptRequested"
+                                        },
+                                        {
+                                            "name": "IsReadReceiptRequested"
+                                        },
+                                        {
+                                            "name": "IsRead"
+                                        },
+                                        {
+                                            "name": "IsDraft"
+                                        },
+                                        {
+                                            "name": "WebLink"
+                                        },
+                                        {
+                                            "name": "CreatedDateTime"
+                                        },
+                                        {
+                                            "name": "LastModifiedDateTime"
+                                        },
+                                        {
+                                            "name": "ChangeKey"
+                                        },
+                                        {
+                                            "name": "Categories"
+                                        },
+                                        {
+                                            "name": "Id"
+                                        }
+                                    ]
+                                },
+                                "sink": {
+                                    "type": "BinarySink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "Office365Messages",
+                                    "type": "DatasetReference"
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "ADLSMessages",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "subfolder_name": {
+                                            "value": "@variables('subfoldername')",
+                                            "type": "Expression"
+                                        },
+                                        "folder_name": {
+                                            "value": "@pipeline().parameters.folder_name",
+                                            "type": "Expression"
+                                        },
+                                        "user_group_name": {
+                                            "value": "@variables('user_group_name')",
+                                            "type": "Expression"
+                                        },
+                                        "file_system_name": {
+                                            "value": "@pipeline().parameters.file_system_name",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "ProcessO365Data_Messages",
+                            "type": "SynapseNotebook",
+                            "dependsOn": [
+                                {
+                                    "activity": "LoadMessages",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "notebook": {
+                                    "referenceName": "ProcessO365Data_Messages",
+                                    "type": "NotebookReference"
+                                },
+                                "parameters": {
+                                    "subfolder_name": {
+                                        "value": {
+                                            "value": "@variables('subfoldername')",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    },
+                                    "data_lake_account_name": {
+                                        "value": {
+                                            "value": "@pipeline().parameters.data_lake_account_name",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    },
+                                    "file_system_name": {
+                                        "value": {
+                                            "value": "@pipeline().parameters.file_system_name",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    },
+                                    "folder_name": {
+                                        "value": {
+                                            "value": "@pipeline().parameters.folder_name",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    },
+                                    "initialLoad": {
+                                        "value": {
+                                            "value": "@pipeline().parameters.initialLoad",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    },
+                                    "user_group_name": {
+                                        "value": {
+                                            "value": "@variables('user_group_name')",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    }
+                                },
+                                "snapshot": true,
+                                "sparkPool": {
+                                    "referenceName": "spark1",
+                                    "type": "BigDataPoolReference"
+                                }
+                            }
+                        },
+                        {
+                            "name": "endtime",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "endtime",
+                                "value": {
+                                    "value": "@formatDateTime(split(activity('GetLastRunDate').output.status.Output.result.exitValue,'_')[1])",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "subfoldername",
+                            "type": "SetVariable",
+                            "dependsOn": [
+                                {
+                                    "activity": "starttime",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                {
+                                    "activity": "endtime",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                {
+                                    "activity": "user_group",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                {
+                                    "activity": "user_group_name",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "subfoldername",
+                                "value": {
+                                    "value": "@concat(string(formatDateTime(variables('starttime'), 'yyyy-MM-dd-HH-mm-ss')),'_',string(formatDateTime(variables('endtime'),'yyyy-MM-dd-HH-mm-ss')))",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "starttime",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "starttime",
+                                "value": {
+                                    "value": "@formatDateTime(split(activity('GetLastRunDate').output.status.Output.result.exitValue,'_')[0])",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "user_group",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "user_group",
+                                "value": {
+                                    "value": "@if(equals(pipeline().parameters.initialLoad,'true'),pipeline().parameters.initial_load_user_group, pipeline().parameters.delta_load_user_group)",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "user_group_name",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "user_group_name",
+                                "value": {
+                                    "value": "@if(equals(pipeline().parameters.initialLoad, 'true'), pipeline().parameters.initial_load_user_group_name, pipeline().parameters.delta_load_user_group_name)",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {
+            "initialLoad": {
+                "type": "string"
+            },
+            "data_lake_account_name": {
+                "type": "string"
+            },
+            "file_system_name": {
+                "type": "string"
+            },
+            "folder_name": {
+                "type": "string"
+            },
+            "initial_load_user_group": {
+                "type": "array"
+            },
+            "initial_load_user_group_name": {
+                "type": "string"
+            },
+            "delta_load_user_group": {
+                "type": "array"
+            },
+            "delta_load_user_group_name": {
+                "type": "string"
+            }
+        },
+        "variables": {
+            "endtime": {
+                "type": "String"
+            },
+            "subfoldername": {
+                "type": "String"
+            },
+            "starttime": {
+                "type": "String"
+            },
+            "pipelinestatus": {
+                "type": "String",
+                "defaultValue": "Success"
+            },
+            "user_group": {
+                "type": "Array"
+            },
+            "user_group_name": {
+                "type": "String"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2022-06-29T22:46:47Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}

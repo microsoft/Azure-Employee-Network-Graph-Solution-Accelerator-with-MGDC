@@ -1,0 +1,134 @@
+{
+    "name": "o365dataload_events_wrapper",
+    "properties": {
+        "activities": [
+            {
+                "name": "o365dataload_events_delta",
+                "type": "ExecutePipeline",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "o365dataload_events",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "initialLoad": {
+                            "value": "false",
+                            "type": "Expression"
+                        },
+                        "data_lake_account_name": {
+                            "value": "@pipeline().parameters.data_lake_account_name",
+                            "type": "Expression"
+                        },
+                        "file_system_name": {
+                            "value": "@pipeline().parameters.file_system_name",
+                            "type": "Expression"
+                        },
+                        "folder_name": {
+                            "value": "@pipeline().parameters.folder_name",
+                            "type": "Expression"
+                        },
+                        "initial_load_user_group": {
+                            "value": "@pipeline().parameters.initial_load_user_group",
+                            "type": "Expression"
+                        },
+                        "initial_load_user_group_name": {
+                            "value": "@pipeline().parameters.initial_load_user_group_name",
+                            "type": "Expression"
+                        },
+                        "delta_load_user_group": {
+                            "value": "@pipeline().parameters.delta_load_user_group",
+                            "type": "Expression"
+                        },
+                        "delta_load_user_group_name": {
+                            "value": "@pipeline().parameters.delta_load_user_group_name",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "o365dataload_events_inital",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "o365dataload_events_delta",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "o365dataload_events",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "initialLoad": {
+                            "value": "true",
+                            "type": "Expression"
+                        },
+                        "data_lake_account_name": {
+                            "value": "@pipeline().parameters.data_lake_account_name",
+                            "type": "Expression"
+                        },
+                        "file_system_name": {
+                            "value": "@pipeline().parameters.file_system_name",
+                            "type": "Expression"
+                        },
+                        "folder_name": {
+                            "value": "@pipeline().parameters.folder_name",
+                            "type": "Expression"
+                        },
+                        "initial_load_user_group": {
+                            "value": "@pipeline().parameters.initial_load_user_group",
+                            "type": "Expression"
+                        },
+                        "initial_load_user_group_name": {
+                            "value": "@pipeline().parameters.initial_load_user_group_name",
+                            "type": "Expression"
+                        },
+                        "delta_load_user_group": {
+                            "value": "@pipeline().parameters.delta_load_user_group",
+                            "type": "Expression"
+                        },
+                        "delta_load_user_group_name": {
+                            "value": "@pipeline().parameters.delta_load_user_group_name",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "data_lake_account_name": {
+                "type": "string"
+            },
+            "file_system_name": {
+                "type": "string"
+            },
+            "folder_name": {
+                "type": "string"
+            },
+            "initial_load_user_group_name": {
+                "type": "string"
+            },
+            "initial_load_user_group": {
+                "type": "array"
+            },
+            "delta_load_user_group_name": {
+                "type": "string"
+            },
+            "delta_load_user_group": {
+                "type": "array"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2022-06-10T23:23:35Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}

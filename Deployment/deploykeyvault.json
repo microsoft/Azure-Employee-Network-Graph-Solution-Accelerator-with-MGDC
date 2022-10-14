@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    
+    "parameters": {
+        "KeyVaultName":{
+            "type":"string",
+            "defaultValue": "xxx", 
+            "metadata": {
+                "description":"The name of your Key Vault that you are using for this solution"
+            }
+        },
+        "TextAnalyticsKey": {
+            "type": "securestring", 
+            "metadata": {
+                "description": "The Text Analytics key you are using for this solution"
+            }
+        }, 
+        "TextAnalyticsEndpoint": {
+            "type": "securestring", 
+            "metadata": {
+                "description": "The Text Analytics endpoint you are using for this solution"
+            }
+        }, 
+        "TextAnalyticsRegion": {
+            "type": "string", 
+            "metadata": {
+                "description": "The Text Analytics region you are using for this solution"
+            }
+        }     
+    },
+
+    "variables": {
+        "TEXT_ANALYTICS_KEY":"TEXTANALYTICSKEY",
+        "TEXT_ANALYTICS_ENDPOINT":"TEXTANALYTICSENDPOINT",
+        "TEXT_ANALYTICS_REGION":"TEXTANALYTICSREGION"
+    },
+
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('KeyVaultName'), '/', variables('TEXT_ANALYTICS_KEY'))]",
+            "properties": {
+                "value": "[parameters('TextAnalyticsKey')]"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('KeyVaultName'), '/', variables('TEXT_ANALYTICS_ENDPOINT'))]",
+            "properties": {
+                "value": "[parameters('TextAnalyticsEndpoint')]"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('KeyVaultName'), '/', variables('TEXT_ANALYTICS_REGION'))]",
+            "properties": {
+                "value": "[parameters('TextAnalyticsRegion')]"
+            },
+            "dependsOn": []
+        },
+        { 
+            "apiVersion": "2020-10-01",
+            "name": "pid-402d4599-92d7-5c69-b137-24515b597ec2",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        }
+    ]
+}
