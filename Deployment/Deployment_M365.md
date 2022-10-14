@@ -9,7 +9,7 @@ In order to perform the necessary actions in the Synapse workspace, you will nee
 1. Go to the Azure Data Lake Storage Account for your Synapse Workspace
 2. Go to the `Access Control (IAM) > + Add > Add role assignment` 
 3. Now search and select the `Storage Blob Data Contributor` role and click "Next" 
-4. Click "+ Select members", search and select your mgdc-spn created in previous steps of the [Prerequisites Guide](./Deployment/Prerequisites.md) and click "Select" 
+4. Click "+ Select members", search and select your mgdc-spn created in previous steps of the [Prerequisites Guide](./Prerequisites.md) and click "Select" 
 5. Click `Review and assign` at the bottom
 
 [Learn more](https://docs.microsoft.com/azure/synapse-analytics/security/how-to-set-up-access-control)
