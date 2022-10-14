@@ -32,7 +32,7 @@ Start by deploying the required resources to Azure. The button below will deploy
 
 > **Note**: 
 > * Azure Cogntive Services require to accept the terms and conditions of Responsible AI when they are first provisioned in an Azure subscription. If none of the Cognitive Services were provisioned previously in the Azure subscription, it is necessary to create a temporary cognitive service (for example Language Service) to accept the AI license terms. The service can be dropped after the creation. Once the requirements are in place, the deploy to Azure button can be used to deploy and configure the solution.
-> * We are deploying tier 0. If you are loading more data you will need to increase the tier to match your data laod needs.**
+> * We are deploying tier 0. If you are loading more data you will need to increase the tier to match your data laod needs.
 
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2FAzure-Employee-Network-Graph-Solution-Accelerator-with-MGDC%2Fmain%2FDeployment%2Fdeploy.json)
