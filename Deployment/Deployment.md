@@ -96,7 +96,7 @@ We are using data provided by [Data World](https://data.world/brianray/enron-ema
 > **Note**: We are running entity extraction for only first 100 messages to save cost and time for the initial deployment. Please update the code to run for all messages if needed. 
 
 ## Step 5: Power BI Set Up 
-1. Open the [Power BI report](https://github.com/microsoft/Azure-Employee-Network-Graph-Solution-Accelerator-with-MGDC/main/Deployment/PowerBI/EmployeeNetworkGraphSA-Dashboard.pbix) in this repository
+1. Open the [Power BI report](https://github.com/microsoft/Azure-Employee-Network-Graph-Solution-Accelerator-with-MGDC/main/PowerBI/EmployeeNetworkGraph.pbix) in this repository
 
 2. Click the Transform data dropdown and click Data source settings 
 
