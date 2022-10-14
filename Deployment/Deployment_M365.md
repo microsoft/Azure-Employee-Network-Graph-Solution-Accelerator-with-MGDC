@@ -1,5 +1,5 @@
 ## Step 1: Prerequisites 
-To use this solution accelerator, you will need access to an [Azure subscription](https://azure.microsoft.com/free/), Microsoft 365 account and Microsoft Graph Data Connect(MGDC) enabled. If you do not have this please follow the [Prerequisites Guide](./Deployment/Prerequisites.md). While not required, a prior understanding of Microsoft Graph Data Connect, and Azure Synapse Analytics will be helpful.
+To use this solution accelerator, you will need access to an [Azure subscription](https://azure.microsoft.com/free/), Microsoft 365 account and Microsoft Graph Data Connect(MGDC) enabled. If you do not have this please follow the [Prerequisites Guide](./Prerequisites.md). While not required, a prior understanding of Microsoft Graph Data Connect, and Azure Synapse Analytics will be helpful.
 
 ## Step 2: Set up Pipelines
 > This step is an optional to connect to your Office 365 account. If you are using the sample dataset from this repository, skip this step
