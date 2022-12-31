@@ -24,13 +24,13 @@ Populate the variables accordingly:
 3. **Key Vault Name**: The name of the Azure Key Vault that was created during previous steps
 4. **Text Analytics Key**: The key for your Text Analytics resource that was created in previous steps
 5. **Text Analytics Endpoint**: The endpoint for your Text Analytics resource that was created in previous steps
-6. **Text Analytics Region**: The region your Text Analytics resouce is in
+6. **Text Analytics Region**: The region your Text Analytics resource is in
 
 ![text analytics](./img/TextAnalyticsKeyVaultDeploy.png)
 
 ### Step 2.3: Add your IP address to Synapse firewall
 Before you can upload assests to the Synapse Workspace you will need to add your IP address:
-1. Go to the Synapse resouce you created in the previous step. 
+1. Go to the Synapse resource you created in the previous step. 
 2. Navigate to `Networking` under `Security` on the left hand side of the page.
 3. At the top of the screen click `+ Add client IP`
     ![Update Firewalls](./img/deploy-firewall.png)  
